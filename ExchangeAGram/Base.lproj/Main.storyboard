@@ -19,7 +19,7 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="w3k-Lh-zIV">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Yjv-qR-QA2">
-                                    <size key="itemSize" width="150" height="150"/>
+                                    <size key="itemSize" width="150" height="170"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="5" minY="5" maxX="5" maxY="5"/>
@@ -29,14 +29,14 @@
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="150" height="150"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="150" height="170"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eJu-vA-Gx4">
                                                     <rect key="frame" x="0.0" y="0.0" width="150" height="150"/>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rYK-yH-lBd">
-                                                    <rect key="frame" x="8" y="121" width="134" height="21"/>
+                                                    <rect key="frame" x="8" y="150" width="134" height="20"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <nil key="highlightedColor"/>
@@ -59,6 +59,11 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" id="Iol-bz-zCF">
+                        <barButtonItem key="leftBarButtonItem" title="Profile" id="mVM-Tf-fkd">
+                            <connections>
+                                <action selector="profileBarButtonItemTapped:" destination="BYZ-38-t0r" id="CpF-Z9-Bfw"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="camera" id="q52-is-B1z">
                             <connections>
                                 <action selector="snapBarButtonItemTapped:" destination="BYZ-38-t0r" id="dmY-ZH-SGr"/>
@@ -67,11 +72,50 @@
                     </navigationItem>
                     <connections>
                         <outlet property="collectionView" destination="w3k-Lh-zIV" id="YZW-V3-HZM"/>
+                        <segue destination="dzh-ei-FSK" kind="show" identifier="profileSegue" id="Lpc-5e-p7B"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1499" y="670"/>
+            <point key="canvasLocation" x="1267" y="-678"/>
+        </scene>
+        <!--Profile View Controller-->
+        <scene sceneID="wG8-XY-0Rx">
+            <objects>
+                <viewController id="dzh-ei-FSK" customClass="ProfileViewController" customModule="ExchangeAGram" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="oWq-eI-DBe"/>
+                        <viewControllerLayoutGuide type="bottom" id="xCb-T5-Ekx"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="2im-Xy-9ci">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vub-t0-Psg">
+                                <rect key="frame" x="20" y="80" width="150" height="150"/>
+                            </imageView>
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hZU-fG-C3b">
+                                <rect key="frame" x="186" y="119" width="228" height="72"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aBo-YT-b6E" customClass="FBLoginView">
+                                <rect key="frame" x="50" y="350" width="200" height="50"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="fbLoginView" destination="aBo-YT-b6E" id="Kth-hW-2JQ"/>
+                        <outlet property="nameLabel" destination="hZU-fG-C3b" id="nFB-JN-9XU"/>
+                        <outlet property="profileImageView" destination="Vub-t0-Psg" id="XRJ-B8-2YL"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jeg-dE-gaf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1947" y="-678"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="50d-2Y-xZA">
@@ -89,7 +133,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ugG-qq-tKh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="797" y="670"/>
+            <point key="canvasLocation" x="589" y="-678"/>
         </scene>
     </scenes>
 </document>

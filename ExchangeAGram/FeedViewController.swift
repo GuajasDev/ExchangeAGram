@@ -31,12 +31,15 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
+    }
+    
+    override func viewDidAppear(animated: Bool) {
         // We are doing the fetch request manually rather than using the NSFetchResultsController manage this for us as in TaskIt mainly to practice both ways
+        
         // Request all the FeedItems we have saved
         let request = NSFetchRequest(entityName: "FeedItem")
         
-        // Get the instance of the APpDelegate back
+        // Get the instance of the AppDelegate back
         let appDelegate:AppDelegate = (UIApplication.sharedApplication().delegate as AppDelegate)
         
         // Get access to the context from the AppDelegate
@@ -44,6 +47,9 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         
         // Execute the fetch request and save the AnyObject instances
         feedArray = context.executeFetchRequest(request, error: nil)!
+        
+        // Reload the data
+        collectionView.reloadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -52,6 +58,10 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     // MARK: IBActions
+    
+    @IBAction func profileBarButtonItemTapped(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("profileSegue", sender: nil)
+    }
     
     @IBAction func snapBarButtonItemTapped(sender: UIBarButtonItem) {
         if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera) {
@@ -104,6 +114,9 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         // Save the image to CoreData. The image will be converted into a data representation (NSData instance, which is a binary representation) of the UIImage instance
         let imageData = UIImageJPEGRepresentation(image, 1.0)
         
+        // Compress the image into a thumbNail in order to optimise the memory usage when showing the filters. The smaller the image the faster the filters will load with the least amount of memory usage. Play around with the value compressionQuality value to get a good balance between quality and performance
+        let thumbNailData = UIImageJPEGRepresentation(image, 0.1)
+        
         // Get the managedObjectContext
         let managedObjectContext = (UIApplication.sharedApplication().delegate as AppDelegate).managedObjectContext
         
@@ -116,6 +129,7 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         // Setup the FeedItem and save it
         feedItem.image = imageData
         feedItem.caption = "Test Caption"
+        feedItem.thumbNail = thumbNailData
         (UIApplication.sharedApplication().delegate as AppDelegate).saveContext()
         
         // Add the feedItem to the feedArray so the user can see the item without having to quit and restart the application
@@ -152,9 +166,11 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
     // MARK: UICollectionViewDelegate
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        // The item at indexPath.row has been tapped...
+        
         let thisItem = feedArray[indexPath.row] as FeedItem
         
-        // Create a filterViewController
+        // Create a filterViewController in code. Note that it doesn't exist in the storyboard
         var filterVC = FilterViewController()
         filterVC.thisFeedItem = thisItem
         self.navigationController?.pushViewController(filterVC, animated: false)
