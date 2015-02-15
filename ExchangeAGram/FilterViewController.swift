@@ -97,21 +97,8 @@ class FilterViewController: UIViewController, UICollectionViewDataSource, UIColl
     // MARK: UICollectionViewDelegate
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        // Get back a UIImage (full size rather than compressed, hence 'thisFeedItem.image' rather than 'thisFeedItem.thumbNail') with the filter in selected item (hence indexPath.row)
-        let filterImage:UIImage = filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
         
-        // Update the image property in thisFeedItem to have the new filtered image
-        let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
-        self.thisFeedItem.image = imageData
-        
-        // Update the thumbNail property in thisFeedItem to have the new filtered image
-        let thumbNailData = UIImageJPEGRepresentation(filterImage, 0.1)
-        self.thisFeedItem.thumbNail = thumbNailData
-        
-        // Save the changes to CoreData
-        (UIApplication.sharedApplication().delegate as AppDelegate).saveContext()
-    
-        self.navigationController?.popViewControllerAnimated(true)
+        createUIAlertController(indexPath)
     }
     
     // MARK: Helper Functions
@@ -165,12 +152,96 @@ class FilterViewController: UIViewController, UICollectionViewDataSource, UIColl
         let extent = filteredImage.extent()
         
         // Create a sample image (a bitmap image, actually) using the filtered image and the extent. It will optimise the UIImage that will be returned later. If unsure what it does try commenting it out and see the difference
-        let cgImage: CGImageRef = context.createCGImage(filteredImage, fromRect: extent)
+        let cgImage: CGImageRef = self.context.createCGImage(filteredImage, fromRect: extent)
         
         // Create the final image by converting the CGImage into a UIImage
         let finalImage = UIImage(CGImage: cgImage, scale: 1.0, orientation: UIImageOrientation.Up)
         
         return finalImage!
+    }
+    
+    
+    // MARK: UIAlertController Helper Functions
+    
+    func createUIAlertController(indexPath: NSIndexPath) {
+        let alert = UIAlertController(title: "Photo Options", message: "Please Choose an option", preferredStyle: UIAlertControllerStyle.Alert)
+        
+        // Add a text field to the alert
+        alert.addTextFieldWithConfigurationHandler { (textField) -> Void in
+            textField.placeholder = "Add Caption!"
+            textField.secureTextEntry = false   // Set to true if you are using a password
+        }
+        
+        // Get the text from the text field
+        let textField = alert.textFields![0] as UITextField
+        
+        // Post to Facebook
+        let photoAction = UIAlertAction(title: "Post photo to Facebook with caption", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
+            self.shareToFacebook(indexPath)
+            
+            var text = textField.text
+
+            self.saveFilterToCoreData(indexPath, caption: text)
+        }
+        
+        alert.addAction(photoAction)
+        
+        // Save the filter
+        let saveFilterAction = UIAlertAction(title: "Save filter without posting to Facebook", style: UIAlertActionStyle.Default) { (UIAlertAction) -> Void in
+            var text = textField.text
+
+            self.saveFilterToCoreData(indexPath, caption: text)
+        }
+        
+        alert.addAction(saveFilterAction)
+        
+        // Cancel
+        let cancelAction = UIAlertAction(title: "Select another filter", style: UIAlertActionStyle.Cancel, handler: { (UIAlertAction) -> Void in
+            
+        })
+        
+        alert.addAction(cancelAction)
+        
+        // Present to the screen
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func saveFilterToCoreData(indexPath: NSIndexPath, caption: String) {
+        // Get back a UIImage (full size rather than compressed, hence 'thisFeedItem.image' rather than 'thisFeedItem.thumbNail') with the filter in selected item (hence indexPath.row)
+        let filterImage:UIImage = filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
+        
+        // Update the image property in thisFeedItem to have the new filtered image
+        let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
+        self.thisFeedItem.image = imageData
+        
+        // Update the thumbNail property in thisFeedItem to have the new filtered image
+        let thumbNailData = UIImageJPEGRepresentation(filterImage, 0.1)
+        self.thisFeedItem.thumbNail = thumbNailData
+        
+        // Update the caption property in thisFeedItem to have the passed caption
+        self.thisFeedItem.caption = caption
+        
+        // Save the changes to CoreData
+        (UIApplication.sharedApplication().delegate as AppDelegate).saveContext()
+        
+        self.navigationController?.popViewControllerAnimated(true)
+    }
+    
+    func shareToFacebook (indexPath: NSIndexPath) {
+        let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
+        
+        // Since the Facebook SDK is written in Objective-C, the 'photos' property requires an NSArray rather than an Array
+        let photos:NSArray = [filterImage]
+        var params = FBPhotoParams()
+        params.photos = photos
+        
+        FBDialogs.presentShareDialogWithPhotoParams(params, clientState: nil) { (call, result, error) -> Void in
+            if result? != nil {
+                println(result)
+            } else {
+                println(error)
+            }
+        }
     }
     
     // MARK: Caching Fucntions
@@ -194,9 +265,7 @@ class FilterViewController: UIViewController, UICollectionViewDataSource, UIColl
     func getCachedImage(imageNumber: Int) -> UIImage {
         // Give the imageFile a unique name and get the path to the temporary directory
         let fileName = "\(imageNumber)"
-        println(fileName)
         let uniquePath = self.tmp.stringByAppendingPathComponent(fileName)
-//        println(uniquePath)
         
         var image:UIImage
         
