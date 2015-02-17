@@ -38,6 +38,13 @@ class ProfileViewController: UIViewController, FBLoginViewDelegate {
         // Dispose of any resources that can be recreated.
     }
     
+    // MARK: IBActions
+    
+    @IBAction func mapViewButtonTapped(sender: UIButton) {
+        // Go to the MapViewController
+        performSegueWithIdentifier("mapSegue", sender: nil)
+    }
+    
     // MARK: FBLoginViewDelegate
     
     func loginViewShowingLoggedInUser(loginView: FBLoginView!) {

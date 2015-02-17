@@ -9,8 +9,9 @@
 import UIKit
 import MobileCoreServices
 import CoreData
+import MapKit
 
-class FeedViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class FeedViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate {
     
     // MARK: - PROPERTIES
     
@@ -24,6 +25,8 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
     // We use 'AnyObject' because when we 'xecuteFetchRequest' in viewDidLoad, we get an array with AnyObject instances. We are doing the fetch request manually rather than using the NSFetchResultsController manage this for us as in TaskIt mainly to practice both ways
     var feedArray:[AnyObject] = []
     
+    var locationManager: CLLocationManager! // CLLocationManager handles where we are and calls a delegate function when we change locations
+    
     // MARK: - BODY
     
     //MARK: Initialisers
@@ -31,6 +34,16 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        // Initialise the CLLocatiuonManager
+        self.locationManager = CLLocationManager()
+        self.locationManager.delegate = self
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        
+        self.locationManager.requestAlwaysAuthorization()   // Requests autorisation to use the user's location
+        
+        self.locationManager.distanceFilter = 100.0 // In metres. The 'didUpdateLocations' function gets called when the user moves more than the specified distance
+        self.locationManager.startUpdatingLocation()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -130,6 +143,8 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         feedItem.image = imageData
         feedItem.caption = "Test Caption"
         feedItem.thumbNail = thumbNailData
+        feedItem.latitude = self.locationManager.location.coordinate.latitude
+        feedItem.longitude = self.locationManager.location.coordinate.longitude
         (UIApplication.sharedApplication().delegate as AppDelegate).saveContext()
         
         // Add the feedItem to the feedArray so the user can see the item without having to quit and restart the application
@@ -174,6 +189,13 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         var filterVC = FilterViewController()
         filterVC.thisFeedItem = thisItem
         self.navigationController?.pushViewController(filterVC, animated: false)
+    }
+    
+    // MARK: CLLocationManagerDelegate
+    
+    func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
+        // Called by the delegate every time the user changes location
+        println("locations = \(locations)")
     }
 }
 
